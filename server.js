@@ -11,11 +11,11 @@ app.use(express.json()); // Ensure JSON parsing
 
 // ✅ MySQL Connection (Using Railway Database)
 const db = mysql.createConnection({
-  host: yamabiko.proxy.rlwy.net,
-  user: root,
-  password: ddrBcfCtHuESrHlYtUGbDepigbAGrxpu,
-  database: railway,
-  port: 23513
+  host:yamabiko.proxy.rlwy.net,
+  user:root,
+  password:ddrBcfCtHuESrHlYtUGbDepigbAGrxpu,
+  database:railway,
+  port:23513
 });
 
 db.connect((err) => {
