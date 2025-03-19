@@ -8,11 +8,13 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Ensure JSON parsing
 
-// ✅ MySQL Connection (Without selecting DB)
+// ✅ MySQL Connection (Using Railway Database)
 const db = mysql.createConnection({
-  host: 'localhost',
+  host: 'yamabiko.proxy.rlwy.net',
   user: 'root',
-  password: 'Happy@23' // Replace with your password
+  password: 'ddrBcfCtHuESrHlYtUGbDepigbAGrxpu',
+  database: 'railway',
+  port: 23513
 });
 
 db.connect((err) => {
@@ -20,45 +22,27 @@ db.connect((err) => {
     console.error('❌ Database connection failed:', err);
     return;
   }
-  console.log('✅ Connected to MySQL Server');
+  console.log('✅ Connected to Railway MySQL Database');
 
-  // ✅ Create Database if not exists
-  db.query('CREATE DATABASE IF NOT EXISTS shipment_db', (err) => {
+  // ✅ Create Table if not exists
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS shipping_rates (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      courier_name VARCHAR(50),
+      pickup_pincode VARCHAR(10),
+      delivery_pincode VARCHAR(10),
+      price DECIMAL(10,2)
+    )
+  `;
+  db.query(createTableQuery, (err) => {
     if (err) {
-      console.error("❌ Error creating database:", err);
+      console.error("❌ Error creating table:", err);
       return;
     }
-    console.log('✅ Database "shipment_db" is ready');
+    console.log('✅ Table "shipping_rates" is ready');
 
-    // 🔄 Close the current connection and Reconnect with the Database
-    db.changeUser({ database: 'shipment_db' }, (err) => {
-      if (err) {
-        console.error("❌ Error selecting database:", err);
-        return;
-      }
-      console.log('✅ Using Database "shipment_db"');
-
-      // ✅ Create Table if not exists
-      const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS shipping_rates (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          courier_name VARCHAR(50),
-          pickup_pincode VARCHAR(10),
-          delivery_pincode VARCHAR(10),
-          price DECIMAL(10,2)
-        )
-      `;
-      db.query(createTableQuery, (err) => {
-        if (err) {
-          console.error("❌ Error creating table:", err);
-          return;
-        }
-        console.log('✅ Table "shipping_rates" is ready');
-
-        // ✅ Check if table is empty before inserting data
-        checkAndLoadData();
-      });
-    });
+    // ✅ Check if table is empty before inserting data
+    checkAndLoadData();
   });
 });
 
